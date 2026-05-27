@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Inc. FP&A Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'DM Sans',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh;padding:32px 24px}
+  .page{max-width:1100px;margin:0 auto}
+
+  .top-bar{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px}
+  .top-bar .brand{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;margin-bottom:6px}
+  .top-bar h1{font-size:26px;font-weight:600;color:#0f172a;letter-spacing:-.02em}
+  .top-bar .meta{text-align:right;font-size:11px;color:#9ca3af;line-height:1.8}
+  .top-bar .meta strong{color:#6b7280;font-weight:500}
+
+  .divider{height:1px;background:linear-gradient(90deg,#185FA5 0%,#1D9E75 40%,transparent 100%);margin-bottom:28px;opacity:.4}
+
+  .kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px}
+  .kpi{background:#fff;border-radius:12px;padding:16px 14px;border:1px solid #e5e7eb;position:relative;overflow:hidden}
+  .kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent,#185FA5)}
+  .kpi.green::before{background:#1D9E75}
+  .kpi.amber::before{background:#EF9F27}
+  .kpi.red::before{background:#E24B4A}
+  .kpi.teal::before{background:#0F6E56}
+  .kpi.purple::before{background:#534AB7}
+  .kpi-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:8px}
+  .kpi-value{font-size:20px;font-weight:600;color:#0f172a;font-family:'DM Mono',monospace;letter-spacing:-.02em}
+  .kpi-sub{font-size:10px;margin-top:5px;color:#6b7280}
+  .kpi-sub.pos{color:#1D9E75;font-weight:500}
+  .kpi-sub.neg{color:#E24B4A;font-weight:500}
+
+  .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px}
+  .chart-box{background:#fff;border-radius:12px;padding:20px;border:1px solid #e5e7eb}
+  .chart-box.full{grid-column:1/-1}
+  .chart-box h3{font-size:13px;font-weight:600;color:#0f172a;margin-bottom:2px}
+  .chart-box .sub{font-size:11px;color:#9ca3af;margin-bottom:14px}
+
+  .legend{display:flex;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#6b7280}
+  .legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+  .variance-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .var-card{border:1px solid #e5e7eb;border-radius:10px;padding:14px;text-align:center}
+  .var-card.miss{border-color:#F09595;background:#FCEBEB}
+  .var-year{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:6px}
+  .var-val{font-size:18px;font-weight:600;font-family:'DM Mono',monospace;color:#0f172a}
+  .var-card.miss .var-val{color:#A32D2D}
+  .var-badge{display:inline-block;margin-top:7px;font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500}
+  .badge-hist{background:#EAF3DE;color:#3B6D11}
+  .badge-miss{background:#F7C1C1;color:#791F1F}
+  .var-fcst{font-size:10px;color:#A32D2D;margin-top:3px}
+
+  .footer{display:flex;justify-content:space-between;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af}
+  .footer strong{color:#6b7280}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top-bar">
+    <div>
+      <div class="brand">FP&amp;A Portfolio Project</div>
+      <h1>Apple Inc. (AAPL) — Financial Dashboard</h1>
+    </div>
+    <div class="meta">
+      <strong>Dataset:</strong> Kaggle 2009–2022<br>
+      <strong>Forecast:</strong> 2023–2028 · 8% CAGR<br>
+      <strong>Source:</strong> Apple 10-K (2023 actuals)
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="kpi-label">Revenue 2022</div>
+      <div class="kpi-value">$394B</div>
+      <div class="kpi-sub pos">+7.8% YoY</div>
+    </div>
+    <div class="kpi green">
+      <div class="kpi-label">Avg gross margin</div>
+      <div class="kpi-value">39.8%</div>
+      <div class="kpi-sub">2009–2022 avg</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">Avg net margin</div>
+      <div class="kpi-value">22.5%</div>
+      <div class="kpi-sub">2009–2022 avg</div>
+    </div>
+    <div class="kpi teal">
+      <div class="kpi-label">2028 Forecast</div>
+      <div class="kpi-value">$626B</div>
+      <div class="kpi-sub">+8% growth p.a.</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-label">2023 Variance</div>
+      <div class="kpi-value" style="color:#A32D2D">-$42.6B</div>
+      <div class="kpi-sub neg">❌ Missed -10%</div>
+    </div>
+    <div class="kpi purple">
+      <div class="kpi-label">Best growth yr</div>
+      <div class="kpi-value">+66%</div>
+      <div class="kpi-sub">2014 · iPhone 6</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-box">
+      <h3>Revenue trend &amp; 5-year forecast</h3>
+      <div class="sub">Actual 2009–2022 · Forecast 2023–2028 at 8% CAGR</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div>Actual revenue</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#9FE1CB;border:1px dashed #0F6E56"></div>Forecasted revenue</div>
+      </div>
+      <div style="position:relative;height:220px">
+        <canvas id="revChart"></canvas>
+      </div>
+    </div>
+    <div class="chart-box">
+      <h3>Profitability margins</h3>
+      <div class="sub">Gross margin vs net margin %</div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#1D9E75"></div>Gross margin</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div>Net margin</div>
+      </div>
+      <div style="position:relative;height:220px">
+        <canvas id="marginChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-box" style="margin-bottom:16px">
+    <h3>Variance analysis — forecast vs actual</h3>
+    <div class="sub">2020–2023 · Only 2023 has a real forecast vs actual comparison</div>
+    <div class="variance-grid">
+      <div class="var-card">
+        <div class="var-year">2020</div>
+        <div class="var-val">$275B</div>
+        <div><span class="var-badge badge-hist">Historical</span></div>
+      </div>
+      <div class="var-card">
+        <div class="var-year">2021</div>
+        <div class="var-val">$366B</div>
+        <div><span class="var-badge badge-hist">Historical</span></div>
+      </div>
+      <div class="var-card">
+        <div class="var-year">2022</div>
+        <div class="var-val">$394B</div>
+        <div><span class="var-badge badge-hist">Historical</span></div>
+      </div>
+      <div class="var-card miss">
+        <div class="var-year">2023</div>
+        <div class="var-val">$383B</div>
+        <div class="var-fcst">Forecast: $426B</div>
+        <div><span class="var-badge badge-miss">❌ Missed −10%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-box full" style="margin-bottom:0">
+    <h3>YoY revenue growth % by year</h3>
+    <div class="sub">Year-over-year growth rate · 2010–2022</div>
+    <div style="position:relative;height:180px">
+      <canvas id="yoyChart"></canvas>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Built with <strong>Kaggle dataset</strong> · Apple Inc. <strong>10-K filings</strong> · Excel financial model</span>
+    <span><strong>FP&amp;A Portfolio Project</strong> Dony Francis · May 2026</span>
+  </div>
+
+</div>
+
+<script>
+const years=['2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024','2025','2026','2027','2028'];
+const actual=[42905,65225,108249,156508,170910,182795,233715,215639,229234,265595,260174,274515,365817,394328,383285,null,null,null,null,null];
+const forecast=[null,null,null,null,null,null,null,null,null,null,null,null,null,394328,425874,459944,496740,536479,579397,625749];
+
+new Chart(document.getElementById('revChart'),{
+  type:'line',
+  data:{labels:years,datasets:[
+    {label:'Actual',data:actual,borderColor:'#185FA5',backgroundColor:'rgba(24,95,165,0.07)',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#185FA5',tension:0.35,fill:true,spanGaps:false},
+    {label:'Forecast',data:forecast,borderColor:'#0F6E56',backgroundColor:'rgba(29,158,117,0.07)',borderWidth:2,borderDash:[6,4],pointRadius:3,pointBackgroundColor:'#0F6E56',tension:0.35,fill:true,spanGaps:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+Math.round(c.raw/1000)+'B'}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9},maxRotation:45,autoSkip:false}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9},callback:v=>'$'+Math.round(v/1000)+'B'}}}}
+});
+
+const mYears=['2009','2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022'];
+const gross=[40.1,39.4,40.5,43.9,37.6,38.6,40.1,39.1,38.5,38.3,37.8,38.2,41.8,43.3];
+const net=[19.2,21.5,23.9,26.7,21.7,21.6,22.8,21.2,21.1,22.4,21.2,20.9,25.9,25.3];
+
+new Chart(document.getElementById('marginChart'),{
+  type:'line',
+  data:{labels:mYears,datasets:[
+    {label:'Gross margin %',data:gross,borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.08)',borderWidth:2,pointRadius:2,tension:0.35,fill:true},
+    {label:'Net margin %',data:net,borderColor:'#EF9F27',backgroundColor:'rgba(239,159,39,0.08)',borderWidth:2,borderDash:[4,3],pointRadius:2,tension:0.35,fill:true}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(1)+'%'}}},scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:9},callback:v=>v+'%'},min:15,max:50}}}
+});
+
+const yoyYears=['2010','2011','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022'];
+const yoyData=[52.0,65.9,44.6,9.2,7.0,27.9,-7.7,6.3,15.9,-2.0,5.5,33.3,7.8];
+const yoyColors=yoyData.map(v=>v>=0?'rgba(29,158,117,0.75)':'rgba(226,75,74,0.75)');
+
+new Chart(document.getElementById('yoyChart'),{
+  type:'bar',
+  data:{labels:yoyYears,datasets:[{label:'YoY Growth %',data:yoyData,backgroundColor:yoyColors,borderRadius:4,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>(c.raw>0?'+':'')+c.raw.toFixed(1)+'%'}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{font:{size:10},callback:v=>v+'%'}}}}
+});
+</script>
+</body>
+</html>
